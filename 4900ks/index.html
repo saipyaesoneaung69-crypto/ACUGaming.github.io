@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>ACU Gaming Shop</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: radial-gradient(circle at 20% 30%, #0a0f1e, #03050b);
+      font-family: 'Inter', sans-serif;
+      color: #f0f3fa;
+      padding: 1rem;
+      min-height: 100vh;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: repeating-linear-gradient(45deg, rgba(255, 70, 200, 0.02) 0px, rgba(255, 70, 200, 0.02) 2px, transparent 2px, transparent 8px);
+      pointer-events: none; z-index: 0;
+    }
+    .container { max-width: 1600px; margin: 0 auto; position: relative; z-index: 2; }
+    .hero { text-align: center; margin-bottom: 1.5rem; }
+    .hero h1 {
+      font-family: 'Orbitron', monospace; font-size: 2.2rem;
+      background: linear-gradient(135deg, #FFD966, #FF6AC2, #6F9EFF);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      letter-spacing: 2px; animation: glitchFlicker 2s infinite;
+    }
+    @media (min-width: 768px) {
+      .hero h1 { font-size: 3rem; }
+      body { padding: 2rem 1.5rem; }
+    }
+    @keyframes glitchFlicker {
+      0% { text-shadow: 0 0 2px #ff00cc, 0 0 4px #00e0ff; }
+      100% { text-shadow: 0 0 6px #ff66cc, 0 0 12px #3a86ff; }
+    }
+    .hero p { font-size: 0.9rem; color: #b9c7ff; margin-top: 0.5rem; border-bottom: 1px dashed rgba(255,255,200,0.3); display: inline-block; padding-bottom: 5px; }
+    
+    /* Price Filter Buttons */
+    .price-filter {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      margin: 1.5rem 0 2rem;
+    }
+    .price-btn {
+      background: rgba(20, 25, 45, 0.8);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 100, 200, 0.5);
+      padding: 0.7rem 1.8rem;
+      border-radius: 50px;
+      font-family: 'Orbitron', monospace;
+      font-weight: bold;
+      font-size: 1rem;
+      color: #f0f3fa;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .price-btn i { margin-right: 8px; }
+    .price-btn:hover {
+      transform: translateY(-3px);
+      border-color: #ff88dd;
+      box-shadow: 0 0 12px #ff66cc70;
+    }
+    .price-btn.active {
+      background: linear-gradient(135deg, #ff66cc, #ff3388);
+      border-color: #fff;
+      box-shadow: 0 0 15px #ff44aa;
+    }
+    @media (max-width: 500px) {
+      .price-btn { padding: 0.5rem 1.2rem; font-size: 0.85rem; }
+      .price-filter { gap: 0.7rem; }
+    }
+
+    .search-section { margin: 1rem 0 1.5rem; display: flex; justify-content: center; }
+    .search-wrapper {
+      background: rgba(20, 25, 45, 0.7); backdrop-filter: blur(12px); border-radius: 60px;
+      padding: 0.2rem 0.2rem 0.2rem 1.2rem; display: flex; align-items: center;
+      width: 100%; max-width: 500px; border: 1px solid rgba(255, 100, 200, 0.6);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5), 0 0 8px #ff44aa40;
+    }
+    .search-wrapper i { font-size: 1.2rem; color: #ffaaff; margin-right: 8px; }
+    #searchInput { background: transparent; border: none; padding: 0.8rem 0; font-size: 1rem; width: 100%; color: #f0f0ff; outline: none; font-weight: 500; }
+    #searchInput::placeholder { color: #a0abdf; font-size: 0.9rem; }
+    .clear-search { background: none; border: none; color: #ff99dd; font-size: 1.2rem; cursor: pointer; padding: 0 1rem; }
+
+    .category-section { margin-bottom: 2rem; }
+    .cat-header { display: flex; align-items: baseline; gap: 0.8rem; flex-wrap: wrap; margin-bottom: 1rem; border-left: 4px solid #ff66cc; padding-left: 0.8rem; }
+    .cat-header h2 { font-family: 'Orbitron', monospace; font-size: 1.3rem; font-weight: 600; background: linear-gradient(120deg, #FFF2B5, #FFC3E0); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    @media (min-width: 768px) {
+      .cat-header h2 { font-size: 1.8rem; }
+    }
+    .cat-header span { background: #ff338850; padding: 0.2rem 0.7rem; border-radius: 30px; font-size: 0.7rem; font-weight: bold; }
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 1rem;
+    }
+    @media (min-width: 480px) {
+      .games-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 1.2rem; }
+    }
+    @media (min-width: 768px) {
+      .games-grid { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 1.5rem; }
+    }
+    .game-card {
+      background: linear-gradient(145deg, #141b2b, #0e121f); border-radius: 18px; overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1); border: 1px solid rgba(255, 100, 180, 0.3);
+      box-shadow: 0 8px 16px -5px rgba(0, 0, 0, 0.5);
+    }
+    .game-card:hover { transform: translateY(-5px) scale(1.01); border-color: #ff88dd; box-shadow: 0 15px 25px -8px black, 0 0 10px #ff66cc70; }
+    .game-img { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background-color: #1a1f2e; }
+    .game-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.3s; }
+    .game-card:hover .game-img img { transform: scale(1.03); }
+    .game-img .game-badge {
+      position: absolute; bottom: 6px; left: 6px; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
+      border-radius: 20px; padding: 3px 10px; font-size: 0.65rem; font-weight: bold; color: #ffe6f0;
+      font-family: monospace; border-left: 2px solid #ff99ee; z-index: 2;
+    }
+    .game-info { padding: 0.7rem 0.6rem 0.8rem; }
+    .game-info h3 { font-size: 0.85rem; font-weight: 700; margin-bottom: 0.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    @media (min-width: 768px) {
+      .game-info h3 { font-size: 1rem; }
+      .game-info { padding: 0.9rem 0.8rem 1rem; }
+    }
+    .game-category-tag { font-size: 0.65rem; color: #ffbcda; background: #2a1f3a60; display: inline-block; padding: 0.15rem 0.5rem; border-radius: 30px; }
+    .price-badge { font-size: 0.65rem; background: #f5a62330; color: #ffd966; margin-left: 0.4rem; display: inline-block; padding: 0.15rem 0.5rem; border-radius: 30px; }
+    .no-results { text-align: center; padding: 2rem; background: #0a0e1ab3; border-radius: 30px; margin-top: 1rem; font-size: 1rem; backdrop-filter: blur(10px); border: 1px dashed #ff77aa; }
+    .footer { margin-top: 2.5rem; text-align: center; font-size: 0.7rem; color: #8e9acf; border-top: 1px solid #2a2f44; padding-top: 1.5rem; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="hero">
+    <h1><i class="fas fa-gamepad"></i> ACU Gaming <i class="fas fa-joystick"></i></h1>
+    <p>Package 3မျိုးထဲမှ မိမိကြိုက်နှစ်သက်ရာ Package တစ်ခုကို ဝယ်ယူရုံနဲ့ သက်ဆိုင်ရာ ဂိမ်းများကိုပါ ကစားနိုင်သည်။ (ဥပမာ 15000ကျပ် Package ကိုဝယ်ယူလျှင် 15000ကျပ် ဟု ရေးထားသော ဂိမ်းအားလုံးကို ကစားနိုင်ပါသည်ခင်ဗျာ။)</p>
+  </div>
+
+  <!-- Price Filter Buttons -->
+  <div class="price-filter">
+    <button class="price-btn" data-price="4900"><i class="fas fa-coins"></i> ၄၉၀၀ ကျပ်</button>
+    <button class="price-btn" data-price="15000"><i class="fas fa-tag"></i> ၁၅၀၀၀ ကျပ်</button>
+    <button class="price-btn" data-price="27500"><i class="fas fa-gem"></i> ၂၇၅၀၀ ကျပ်</button>
+  </div>
+
+  <div class="search-section">
+    <div class="search-wrapper">
+      <i class="fas fa-search"></i>
+      <input type="text" id="searchInput" placeholder="ဂိမ်းအမည်ဖြင့် ရှာဖွေပါ..." autocomplete="off">
+      <button class="clear-search" id="clearSearchBtn"><i class="fas fa-times-circle"></i></button>
+    </div>
+  </div>
+  <div id="categoriesContainer"></div>
+  <div class="footer"><i class="fas fa-mobile-alt"><!--</i> မိုဘိုင်း အဆင်ပြေစေရန် အလိုက်သင့်ပြင်ဆင်ထား | ခလုတ်နှိပ်၍ ကြည့်ရှုပါ--></div>
+</div>
+
+<script>
+  // ---------- မူရင်း GAME DATABASE (အတိအကျ) ----------
+  const originalGamesData = [
+    { name: "Little Nightmares I", category: "Horror", img: "LittleNightmare1.png" },
+    { name: "Hollow Knight Silksong", category: "Action", img: "Hollow Knight Silksong.avif" },
+    { name: "Persona 5 Strikers", category: "Action", img: "Persona 5 Strikers.jpg.avif" },
+    { name: "Summer's Heartbeats", category: "RPG",img: "Summer's Heartbeats.jpg" },
+    { name: "Dragon Quest I and II HD-2D Remake", category: "RPG",img: "Dragon Quest I and II HD-2D Remake.png" },
+    { name: "Master of Love", category: "RPG",img: "Master of Love.jpg.png" },
+    { name: "Chrono Ark", category: "RPG", img: "Chrono Ark.avif" },
+    { name: "Five Hearts Under One Roof 1", category: "RPG" ,img: "Five Hearts Under One Roof 1.jpg" },
+    { name: "Five Heart Under One Roof2", category: "RPG" , img : "Five Heart Under One Roof2.jpg" },
+    { name: "Persona 4 Golden", category: "RPG",img : "Persona 4 Golden.jpg" },
+    { name: "AIR", category: "RPG",img : "Air.jpg" },
+    { name: "Pokemon Ultra Moon", category: "RPG",img:"Pokemon Ultra Moon.avif" },
+    { name: "Pokemon Ultra Sun", category: "RPG",img:"Pokemon Ultra Sun.jpg" },
+    { name: "Slay The Spire 2", category: "RPG",img:"Slay The Spire 2.jpg" },
+    { name: "The Witch's Trial of Magical Girls", category: "RPG" ,img : "The Witch's Trial of Magical Girls.jpg"},
+    { name: "Inscryption", category: "RPG",img:"Inscryption.jpeg" },
+    { name: "Dragon Ball Xenoverse 2 - Extra Pack 2: Songs of the Future", category: "Action" ,img : "Dragon Ball Xenoverse 2Extra Pack 2Songs of the Future.jpg"},
+    { name: "Dying Light:The Beast", category: "Action",img : "Dying LightThe Beast.jpg" },
+    { name: "Call of Duty Advanced Warfare", category: "Action",img : "Call of Duty Advanced Warfare.jpg" },
+    { name: "Call of duty ghosts", category: "Action",img : "Call of duty ghosts.jpg" },
+    { name: "Grand Theft Auto:Vice City", category: "Action",img : "Grand Theft Auto Vice City.jpg" },
+    { name: "Grand Theft Auto San Address Definitive Edition", category: "Action",img : "Grand Theft Auto San Address Definitive Edition.jpeg" },
+    { name: "Sifu", category: "Action",img : "Sifu.jpg" },
+    { name: "Attack on Titan 2", category: "Action",img : "Attack on Titan 2.jpg" },
+    { name: "Dying Light", category: "Action",img : "Dying Light.jpg.webp" },
+    { name: "Just Case 4", category: "Action",img : "Just Case 4.jpg" },
+    { name: "Just Case 2", category: "Action",img : "Just Case 2.jpg" },
+    { name: "Sniper Elite 3", category: "Action" ,img : "Sniper Elite 3.jpg"},
+    { name: "Watch Dog 2", category: "Action",img : "Watch Dog 2.jpg" },
+    { name: "Watch Dog1", category: "Action" ,img : "Watch Dog1.jpg"},
+    { name: "BroForce", category: "Action",img : "BroForce.avif" },
+    { name: "NINJA GAIDEN:Ragebound", category: "Action",img : "NINJA GAIDEN Ragebound.avif" },
+    { name: "ENDER MAGNOLIA: Bloom in the Mist", category: "Action",img : "ENDER MAGNOLIA Bloom in the Mist.avif" },
+    { name: "Jujutsu Kaisen Cursed Clash", category: "Action",img : "Jujutsu Kaisen Cursed Clash.jpg.avif" },
+    { name: "Naruto Shippuden:Ultimate Ninja Storm 4", category: "Action",img : "Naruto Shippuden Ultimate Ninja Storm 4.jpg" },
+    { name: "Dragon Ball Z : KAKAPOT", category: "Action",img : "Dragon Ball Z  KAKAPOT.jpg" },
+    { name: "Hollo Knight: God Master", category: "Action",img : "Hollo Knight God Master.jpg" },
+    { name: "Dead Cell Return to Castlevania", category: "Action",img : "Dead Cell Return to Castlevania.avif" },
+    { name: "Ori and The will of the wisps", category: "Action" ,img : "Ori and The will of the wisps.jpg"},
+    { name: "Castle Crasher new", category: "Action",img : "Castle Crasher new.avif" },
+    { name: "Cup Head", category: "Action",img : "Cup Head.avif" },
+    { name: "Naruto to Borate:SHINOBI Striker", category: "Action",img : "Naruto to Borate SHINOBI Striker.jpg" },
+    { name: "Lego Marvel Super heroes", category: "Action",img : "Lego Marvel Superheros.avif" },
+    { name: "SpongBob SquarePants: The Cosmic Shake", category: "Action",img : "SpongBob SquarePants The Cosmic Shake.jpg" },
+    { name: "WWE 2k 23", category: "Fighting",img:"WWE 2k 23.jpeg" },
+    { name: "Marvel vs Capcom : Infinite", category: "Fighting",img:"Marvel vs Capcom  Infinite.jpg" },
+    { name: "Ultraman Fighting Evolution Rebirth", category: "Fighting",img:"Ultraman Fighting Evolution Rebirth.jpg" },
+    { name: "Ultraman Fighting Evolution3", category: "Fighting",img:"Ultraman Fighting Evolution3.png" },
+    { name: "Ultraman Fighting Evolution 2", category: "Fighting",img:"Ultraman Fighting Evolution 2.webp" },
+    { name: "Ultraman Fighting Evolution 0", category: "Fighting",img:"Ultraman Fighting Evolution 0.jpg" },
+    { name: "UltrmanUltraman Nexus", category: "Fighting",img:"UltrmanUltraman Nexus.webp" },
+    { name: "Little Nightmare II", category: "Horror",img:"Little Nightmare II.jpg" },
+    { name: "Little Nightmare III", category: "Horror",img:"Little Nightmare III.jpg" },
+    { name: "Amanda the Adventurer2", category: "Horror",img:"Amanda the Adventurer2.jpeg" },
+    { name: "Garten of Banban 7", category: "Horror",img:"Garten of Banban 7.jpg" },
+    { name: "Garten go Banban 2", category: "Horror",img:"Garten go Banban 2.avif" },
+    { name: "Inside the Backrooms", category: "Horror",img:"Inside the Backrooms.jpg" },
+    { name: "Choo-Choo Charlen", category: "Horror",img:"Choo-Choo Charlen.jpg" },
+    { name: "Slendytubbies 3", category: "Horror",img:"Slendytubbies 3.webp"},
+    { name: "MiSide", category: "Horror",img:"MiSide.jpg" },
+    { name: "Mannys", category: "Horror",img:"Mannys.jpg" },
+    { name: "Zoonomaly", category: "Horror",img:"Zoonomaly.jpg" },
+    { name: "Goat Simulator 3", category: "Simulation",img:"Goat Simulator 3.jpg" },
+    { name: "Slime Rancher", category: "Simulation",img:"Slime Rancher.avif" },
+    { name: "PowerWash Simulator", category: "Simulation",img:"PowerWash Simulator.jpeg" },
+    { name: "BeamNG.drive", category: "Simulation" ,img:"BeamNG.drive.jpeg"},
+    { name: "Just Die Already", category: "Simulation",img:"Just Die Already.jpeg" },
+    { name: "DEEEER Simulator", category: "Simulation",img:"DEEEER Simulator.jpg" },
+    { name: "Needy Girl Overdose", category: "Simulation",img:"Needy Girl Overdose.jpg" },
+    { name: "Oxygen Not Include", category: "Simulation",img:"Oxygen Not Include.jpg" },
+    { name: "Go-G0 Town!", category: "Simulation",img:"Go-G0 Town!.jpg" },
+    { name: "A Game About Digging A Hole", category: "Simulation",img:"A Game About Digging A Hole.png" },
+    { name: "Cult of the Lamp", category: "Simulation",img:"Cult of the Lamp.jpg" },
+    { name: "Wolf Mate", category: "Simulation",img:"Wolf Mate.jpg" },
+    { name: "Plant vs Zombies:Replanted", category: "Strategy",img:"Plant vs ZombiesReplanted.jpg.png" },
+    { name: "Plants Vs Zombies Hybrid Edition", category: "Strategy",img:"Plants Vs Zombies Hybrid Edition.png.webp" },
+    { name: "The King is Watching", category: "Strategy",img:"The King is Watching.jpg" },
+    { name: "Patapon 1+2 Replay", category: "Strategy",img:"Patapon 1+2 Replay.jpeg" },
+    { name: "Subnautica:Below Zero", category: "Adventure",img:"Subnautica Below Zero.webp" },
+    { name: "Subnautica", category: "Adventure",img:"Subnautica.jpg" },
+    { name: "Green Hell", category: "Adventure",img:"Green Hell.jpg" },
+    { name: "The Long Dark", category: "Adventure",img:"The Long Dark.jpeg" },
+    { name: "Little Kitty Big City", category: "Adventure",img:"Little Kitty Big City.avif" },
+    { name: "Hello Neighbor 2", category: "Adventure",img:"Hello Neighbor 2.jpg" },
+    { name: "Phoenix Wright: Ace Attorney Trilogy", category: "Adventure",img:"Phoenix WrightAce Attorney Trilogy.avif" },
+    { name: "Is this Seat Taken", category: "Puzzle",img:"Is this Seat Taken.avif" },
+    { name: "Q Remastered", category: "Puzzle",img:"Q Remastered.jpeg" },
+    { name: "NBA 2K 17", category: "Sports",img:"NBA 2K 17.jpg" },
+    { name: "NBA 2K 22", category: "Sports",img:"NBA 2K 22.jpg" },
+    { name: "Tomb Raider", category: "Adventure", img: "TombRaider.avif" },
+    { name: "Prototype 2", category: "Action", img: "Prototype 2.jpg" },
+    { name: "Untited Goose Game", category: "Simulation",img:"UntitledGoose.avif" },
+  ];
+
+  // ---------- ဂိမ်းသစ်များ (၂၇၅၀၀ အုပ်စု) နှင့် ၎င်းတို့၏ သင့်တော်ရာ Category သတ်မှတ်ခြင်း ----------
+  // Category mapping လုပ်ရန် array (ဂိမ်းအမည်၊ category၊ ပုံဥပမာ ၃ခုအတွက် img ထည့်ထား)
+  const newGamesWithCategory = [
+    { name: "Euro Truck Simulator 2", category: "Simulation", img: "Euro Truck Simulator 2.jpg" },
+    { name: "Poppy Playtime Chapter 5", category: "Horror", img: "Poppy Playtime Chapter 5.jpeg" },
+    { name: "REANIMAL", category: "Horror", img: "REANIMAL.jpg" },
+    { name: "Darkest Dungeon", category: "RPG", img: "Darkest Dungeon.avif" },
+    { name: "Crusader Kings III", category: "Strategy", img: "Crusader Kings III.jpg" },
+    { name: "Assassin's Creed Odyssey", category: "Action", img: "Assassin's Creed Odyssey.jpg" },
+    { name: "Snow Runner", category: "Simulation", img: "Snow Runner.avif" },
+    { name: "Forza Horizon 5", category: "Sports", img: "Forza Horizon 5.jpg" },
+    { name: "Red Dead Redemption 2", category: "Action", img: "Red Dead Redemption 2.jpg" }, // ပုံဥပမာ ၁
+    { name: "FIFA 21", category: "Sports", img: "FIFA 21.png" },
+    { name: "FIFA 20", category: "Sports", img: "FIFA 20.png.webp" },
+    { name: "Batman: Arkham Knight", category: "Action", img: "Batman Arkham Knight.jpg" },
+    { name: "NBA 2K23", category: "Sports", img: "NBA 2K23.jpg" },
+    { name: "Atelier Yumia: The Alchemist of", category: "RPG", img: "Atelier Yumia The Alchemist of.jpg" },
+    { name: "inZOI", category: "Simulation", img: "inZOI.jpg" },
+    { name: "Uncharted 4: A Thief's End", category: "Action", img: "Uncharted 4 A Thief's End.jpg" },
+    { name: "Uncharted: The Lost Legacy", category: "Action", img: "Uncharted The Lost Legacy.jpg" },
+    { name: "Ghost Of Tsushima", category: "Action", img: "Ghost Of Tsushima.jpg" },
+    { name: "Fallout 4", category: "RPG", img: "Fallout 4.jpeg" },
+    { name: "Mafia II", category: "Action", img: "Mafia II.jpg" },
+    { name: "Mafia III", category: "Action", img: "Mafia III.jpg" },
+    { name: "Grand Theft Auto V", category: "Action", img: "Grand Theft Auto V.jpg" }, // ပုံဥပမာ ၂
+    { name: "Red Dead Redemption", category: "Action", img: "Red Dead Redemption.jpg" },
+    { name: "Cyberpunk 2077", category: "RPG", img: "Cyberpunk 2077.jpg" }, // ပုံဥပမာ ၃
+    { name: "The Legend Of Zelda: Tears of the Kingdom", category: "Adventure", img: "The Legend Of Zelda Tears of the Kingdom.jpg.webp" },
+    { name: "The Legend of Zelda: Breath of the Wild", category: "Adventure", img: "The Legend of Zelda Breath of the Wild.avif" },
+    { name: "Watch Dogs: Legion", category: "Action", img: "Watch Dogs Legion.jpg" },
+    { name: "The Precinct", category: "Action", img: "The Precinct.jpg.webp" },
+    { name: "Sword of the Sea", category: "Adventure", img: "Sword of the Sea.jpg" },
+    { name: "Grounded 2", category: "Adventure", img: "Grounded 2.jpg" },
+    { name: "The Lord of the Rings: Return to Moria", category: "Adventure", img: "The Lord of the Rings Return to Moria.jpg" },
+    { name: "Rune Factory: Guardians of Azuma", category: "RPG", img: "Rune Factory Guardians of Azuma.jpg" },
+    { name: "Elden Ring Nightreign", category: "RPG", img: "Elden Ring Nightreign.jpg" },
+    { name: "The Elder Scrolls IV: Oblivion Remastered", category: "RPG", img: "The Elder Scrolls IV Oblivion Remastered.jpg" },
+    { name: "Clair Obscur: Expedition 33", category: "RPG", img: "Clair Obscur Expedition 33.webp" },
+    { name: "Final Fantasy XVI", category: "RPG", img: "Final Fantasy XVI.jpg" },
+    { name: "WWE 2K 25", category: "Fighting", img: "WWE 2K 25.jpg" },
+    { name: "Kingdom Come Deliverance II", category: "RPG", img: "Kingdom Come Deliverance II.jpg.avif" },
+    { name: "NINJA GAIDEN 2 Black", category: "Action", img: "NINJA GAIDEN 2 Black.jpg" },
+    { name: "Marvel's Spiderman Remastered 2", category: "Action", img: "Marvel's Spiderman Remastered 2.jpeg" },
+    { name: "Final Fantasy VII Rebirth", category: "RPG", img: "Final Fantasy VII Rebirth.jpeg" },
+    { name: "Jotunnslayer Hordes of Hel", category: "Action", img: "Jotunnslayer Hordes of Hel.jpg" },
+    { name: "Among Ashes", category: "Horror", img: "Among Ashes.jpg" },
+    { name: "Poppy Playtime - Chapter 2", category: "Horror", img: "Poppy Playtime - Chapter 2.jpeg" },
+    { name: "Poppy Playtime Chapter 4", category: "Horror", img: "Poppy Playtime Chapter 4.jpeg" },
+    { name: "Poppy Playtime Chapter 1", category: "Horror", img: "Poppy Playtime Chapter 1.jpg" },
+    { name: "Silent Hill 2 Remake", category: "Horror", img: "Silent Hill 2 Remake.jpg" },
+    { name: "Platform 8", category: "Horror", img: "Platform 8.avif" },
+    { name: "Poppy Playtime Chapter 3", category: "Horror", img: "Poppy Playtime Chapter 3.avif" },
+    { name: "Resident Evil 2 Remake", category: "Horror", img: "Resident Evil 2 Remake.avif" },
+    { name: "Resident Evil Village", category: "Horror", img: "Resident Evil Village.jpg" },
+    { name: "Drop Ducky", category: "Puzzle", img: "Drop Ducky.jpg" },
+    { name: "Fantasy Life I: The Girl Who Steals Time", category: "RPG", img: "Fantasy Life I The Girl Who Steals Time.jpg" },
+    { name: "City Skyline 2", category: "Simulation", img: "City Skyline 2.jpeg" },
+    { name: "Russian Fishing 4", category: "Simulation", img: "Russian Fishing 4.jpg" },
+    { name: "Frostpunk 2", category: "Strategy", img: "Frostpunk 2.jpg" },
+    { name: "TCG Card Shop Simulator", category: "Simulation", img: "TCG Card Shop Simulator.jpg" },
+    { name: "SCUM", category: "Survival", img: "SCUM.jpeg" },  // Survival -> Adventure အုပ်စုထဲထည့်မည်
+    { name: "The Last Of Us Part I", category: "Action", img: "The Last Of Us Part I.jpg" },
+    { name: "The Last Of Us Part II", category: "Action", img: "The Last Of Us Part II.jpg" },
+    { name: "Way Of The Hunter Lintukoto", category: "Simulation", img: "Way Of The Hunter Lintukoto.jpeg" },
+    { name: "Son Of The Forest", category: "Horror", img: "Son Of The Forest.jpg" },
+    { name: "Kirby's Return to Dream Land", category: "Action", img: "Kirby's Return to Dream Land.avif" },
+    { name: "Kirby's Dream Buffet", category: "Action", img: "Kirby's Dream Buffet.avif" },
+    { name: "Kirby Fighter 2", category: "Fighting", img: "Kirby Fighter 2.jpeg" },
+    { name: "Animal Crossing New Horizons", category: "Simulation", img: "Animal Crossing New Horizons.avif" },
+    { name: "Pokemon Shining Pearl", category: "RPG", img: "Pokemon Shining Pearl.avif" },
+    { name: "Pokemon Brilliant Diamond", category: "RPG", img: "Pokemon Brilliant Diamond.avif" },
+    { name: "Pokemon Legends: Acres", category: "RPG", img: "Pokemon LegendsAcres.avif" },
+    { name: "Pokemon Scarlet", category: "RPG", img: "Pokemon Scarlet.avif" },
+    { name: "Pokemon Violet", category: "RPG", img: "Pokemon Violet.avif" },
+    { name: "Pokemon Sword", category: "RPG", img: "Pokemon Sword.avif" },
+    { name: "Pokemon Shield", category: "RPG", img: "Pokemon Shield.avif" },
+    { name: "Super Mario Bros Wonder", category: "Action", img: "Super Mario Bros Wonder.avif" },
+    { name: "Super Mario 3D World", category: "Action", img: "Super Mario 3D World.webp" },
+    { name: "Super Mario Odyssey", category: "Action", img: "Super Mario Odyssey.avif" },
+    { name: "Mario Kart 8 Deluxe", category: "Sports", img: "Mario Kart 8 Deluxe.avif" },
+    { name: "Palworld", category: "Adventure", img: "Palworld.jpeg" },
+    { name: "Call Of Duty: Modern Warfare Remastered", category: "Action", img: "Call Of Duty Modern Warfare Remastered.jpg" },
+    { name: "Marvel's Spider-Man Remastered", category: "Action", img: "Marvel Spider-Man Remastered.jpg" },
+    { name: "Marvel's Spider-Man Miles Morales", category: "Action", img: "marvel spiderman miles morales.jpg" },
+    { name: "God Of War Ragnork", category: "Action", img: "God Of War Ragnork.jpg" }
+    
+  ];
+
+  // SCUM ကို Adventure ထဲထည့်ရန် mapping ပြင်မယ်
+  for (let g of newGamesWithCategory) {
+    if (g.name === "SCUM") g.category = "Adventure";
+  }
+
+  // Price Groups များ
+  const price4900Games = originalGamesData.map(g => ({ ...g, price: 4900 }));
+  const price15000Games = originalGamesData.map(g => ({ ...g, price: 15000 }));
+  // 27500 အုပ်စု: မူရင်းဂိမ်းများ + ဂိမ်းသစ်များ (category mapping ပြုပြီးသား)
+  const price27500Games = [
+    ...originalGamesData.map(g => ({ ...g, price: 27500 })),
+    ...newGamesWithCategory.map(g => ({ name: g.name, category: g.category, img: g.img, price: 27500 }))
+  ];
+
+  // Category မြန်မာလို ပြန်ဆိုရန်
+  function getCategoryName(category) {
+    const map = {
+      "Action": "လှုပ်ရှားမှု (Action)",
+      "RPG": "အခန်းကဏ္ဍ (RPG)",
+      "Fighting": "တိုက်ပွဲ (Fighting)",
+      "Horror": "ထိတ်လန့် (Horror)",
+      "Simulation": "အတုယူမှု (Simulation)",
+      "Strategy": "မဟာဗျူဟာ (Strategy)",
+      "Adventure": "စွန့်စားခန်း (Adventure)",
+      "Puzzle": "ပဟေဠိ (Puzzle)",
+      "Sports": "အားကစား (Sports)",
+      "Survival": "ရှင်သန်ရေး (Survival)"
+    };
+    return map[category] || category;
+  }
+
+  // Game Card HTML generator (ပုံပါရင်ပုံပြ၊ မပါရင် gradient)
+  function getGameCardHTML(game) {
+    const hasImage = game.img && game.img.trim() !== "";
+    let imageHtml = "";
+    if (hasImage) {
+      imageHtml = `<img src="${game.img}" alt="${game.name}" loading="lazy">`;
+    } else {
+      let hash = 0;
+      for(let i = 0; i < game.name.length; i++) { hash = ((hash<<5)-hash)+game.name.charCodeAt(i); hash |= 0; }
+      const hue1 = Math.abs(hash % 360);
+      const hue2 = (hue1 + 40) % 360;
+      const gradient = `linear-gradient(135deg, hsl(${hue1}, 70%, 35%), hsl(${hue2}, 80%, 20%))`;
+      let initials = game.name.split(' ').map(w=>w[0]).join('').slice(0,3).toUpperCase();
+      if(initials.length === 0) initials = "🎮";
+      imageHtml = `<div style="position:absolute; top:0; left:0; width:100%; height:100%; background: ${gradient};"></div>
+                   <div class="game-badge" style="bottom:8px; left:8px;"><i class="fas fa-gamepad"></i> ${initials}</div>`;
+    }
+    const priceFormatted = game.price.toLocaleString() + " ကျပ်";
+    return `<div class="game-card">
+              <div class="game-img" style="position: relative;">
+                ${imageHtml}
+                ${!hasImage ? '' : `<div class="game-badge"><i class="fas fa-image"></i> ပုံ</div>`}
+              </div>
+              <div class="game-info">
+                <h3 title="${game.name}">${game.name}</h3>
+                <div><span class="game-category-tag"><i class="fas fa-tag"></i> ${getCategoryName(game.category)}</span>
+                <span class="price-badge"><i class="fas fa-coins"></i> ${priceFormatted}</span></div>
+              </div>
+            </div>`;
+  }
+
+  // State
+  let activePrice = 4900;
+  let searchTerm = "";
+
+  function render() {
+    let games = [];
+    if (activePrice === 4900) games = [...price4900Games];
+    else if (activePrice === 15000) games = [...price15000Games];
+    else games = [...price27500Games];
+
+    if (searchTerm.trim() !== "") {
+      const lowerTerm = searchTerm.toLowerCase();
+      games = games.filter(g => g.name.toLowerCase().includes(lowerTerm));
+    }
+
+    const container = document.getElementById("categoriesContainer");
+    if (!container) return;
+    if (games.length === 0) {
+      container.innerHTML = `<div class="no-results"><i class="fas fa-skull-crossbones"></i> "${searchTerm}" အတွက် ဂိမ်းမတွေ့ပါ။</div>`;
+      return;
+    }
+
+    // Group by category
+    const grouped = new Map();
+    games.forEach(g => {
+      const cat = g.category;
+      if (!grouped.has(cat)) grouped.set(cat, []);
+      grouped.get(cat).push(g);
+    });
+    const order = ["Action","RPG","Fighting","Horror","Simulation","Strategy","Adventure","Puzzle","Sports","Survival"];
+    let html = "";
+    for (let cat of order) {
+      const gameList = grouped.get(cat);
+      if (gameList && gameList.length) {
+        html += `<div class="category-section">
+                  <div class="cat-header">
+                    <h2><i class="fas fa-tag"></i> ${getCategoryName(cat)}</h2>
+                    <span>${gameList.length} ဂိမ်း</span>
+                  </div>
+                  <div class="games-grid">`;
+        gameList.forEach(game => { html += getGameCardHTML(game); });
+        html += `</div></div>`;
+      }
+    }
+    container.innerHTML = html;
+  }
+
+  // Price button events
+  const btns = document.querySelectorAll(".price-btn");
+  function setActiveButton(price) {
+    btns.forEach(btn => {
+      const btnPrice = parseInt(btn.getAttribute("data-price"));
+      if (btnPrice === price) btn.classList.add("active");
+      else btn.classList.remove("active");
+    });
+  }
+  btns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      activePrice = parseInt(btn.getAttribute("data-price"));
+      setActiveButton(activePrice);
+      render();
+    });
+  });
+
+  // Search events
+  const searchInput = document.getElementById("searchInput");
+  const clearBtn = document.getElementById("clearSearchBtn");
+  function updateSearch() {
+    searchTerm = searchInput.value;
+    render();
+  }
+  searchInput.addEventListener("input", updateSearch);
+  clearBtn.addEventListener("click", () => {
+    searchInput.value = "";
+    searchTerm = "";
+    render();
+    searchInput.focus();
+  });
+
+  // Initial render
+  setActiveButton(4900);
+  render();
+</script>
+</body>
+</html>
